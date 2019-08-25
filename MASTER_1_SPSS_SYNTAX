@@ -1,0 +1,28 @@
+/*OUVRIR UN FICHIER DE DONNEES SPSS (format .sav)
+GET FILE= 'C:\Users\...'
+
+/* Exemple du cours
+GET FILE= 'C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS 2019_2020\WorldBank_Project_2019.sav'
+
+/*SAUVEGARDER LE FICHIER SOUS UN AUTRE NOM
+SAVE OUTFILE= 'C:\Users\...'
+
+
+/* Exemple du cours 'WORKING_FILE'
+SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS 2019_2020\WorldBank_Project_2019_WORKING_FILE.sav'
+
+
+
+/*SAUVEGARDER LE FICHIER SOUS UN MEME NOM
+SAVE OUTFILE= 'C:\Users\...'
+/COMPRESSED
+
+
+/* Exemple du cours 'WORKING_FILE'
+SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS 2019_2020\WorldBank_Project_2019_WORKING_FILE.sav'
+/COMPRESSED
+
+
+
+
+
