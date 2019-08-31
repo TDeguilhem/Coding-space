@@ -1,0 +1,108 @@
+
+* Ouvrir le fichier Macro2010.sav
+
+GET
+  FILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS '+
+    '2019_2020\Macro2010.sav'.
+DATASET NAME DataSet1 WINDOW=FRONT.
+
+
+
+* Enregistrer la base sous Macro2010_TD.sav
+
+SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS 2019_2020\Macro2010_TD.sav'
+  /COMPRESSED.
+  
+
+
+* Ajouter les observations de la base OECD2010.sav
+
+DATASET ACTIVATE DataSet1.
+ADD FILES /FILE=*
+  /FILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS '+
+    '2019_2020\OECD2010.sav'.
+EXECUTE.
+
+
+
+* Ordonner les données par pays 
+
+SORT CASES BY Country (A).
+DATASET ACTIVATE DataSet1. 
+SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES '+ 
+    'SPSS 2019_2020\Macro2010_TD.sav' 
+ /COMPRESSED.
+
+
+
+
+
+* Importer les données en .csv 
+
+GET DATA
+  /TYPE=TXT
+  /FILE="C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS "+
+    "2019_2020\GDP2010.csv"
+  /DELCASE=LINE
+  /DELIMITERS=";"
+  /ARRANGEMENT=DELIMITED
+  /FIRSTCASE=2
+  /IMPORTCASE=ALL
+  /VARIABLES=
+  Country A22
+  GDP_2010 F11.9
+  GDP_growth F2.0
+  GDPcap_growth F2.0
+  Inf F2.0
+  Export F3.0
+  Import F3.0.
+CACHE.
+EXECUTE.
+DATASET NAME DataSet2 WINDOW=FRONT.
+
+SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS 2019_2020\GDP2010.sav'
+  /COMPRESSED.
+SORT CASES BY Country (A).  
+DATASET ACTIVATE DataSet2. 
+SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES '+ 
+    'SPSS 2019_2020\GDP2010.sav' 
+ /COMPRESSED.
+DATASET CLOSE DataSet2.
+
+
+* Fonction 'merge' : ajouter des variables d'une autre base de données
+
+DATASET ACTIVATE DataSet1.
+MATCH FILES /TABLE=*
+  /FILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS '+
+    '2019_2020\GDP2010.sav'
+  /BY Country.
+EXECUTE.
+SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS 2019_2020\Macro2010_TD1.sav'
+  /COMPRESSED.
+
+
+* Tableau Variables
+
+DISPLAY DICTIONARY.
+
+* De String à Numeric pour les variables Vulnerable Socprotection_exp
+
+ALTER TYPE Vulnerable Socprotection_exp (f1.2).
+
+* Recodage automatique des modalités des variables Region, HDI et OECD
+
+
+AUTORECODE VARIABLES=Region HDI OECD 
+  /INTO REGION_RECODE HDI_RECODE OECD_RECODE
+  /PRINT.
+  
+  * Recodage des modalités
+  
+  RECODE HDI (1=4).
+EXECUTE.
+
+
+  
+  
+
