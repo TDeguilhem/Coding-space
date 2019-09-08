@@ -1,21 +1,28 @@
+*
+*
+*Codes pour le TD n°1 réalisé à la séance n°2 (16/09/2019).
+*
+*
+*
 
-* Ouvrir le fichier Macro2010.sav
+*1/ Ouvrir le fichier Macro2010.sav et enregistrer sous Macro2010_TD.sav
+
+
+*A/ Ouvrir
 
 GET
   FILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS '+
     '2019_2020\Macro2010.sav'.
 DATASET NAME DataSet1 WINDOW=FRONT.
 
-
-
-* Enregistrer la base sous Macro2010_TD.sav
+*B/ Sauvegarder
 
 SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS 2019_2020\Macro2010_TD.sav'
   /COMPRESSED.
   
 
 
-* Ajouter les observations de la base OECD2010.sav
+*2/ "Append process" : ajouter les observations de la base OECD2010.sav
 
 DATASET ACTIVATE DataSet1.
 ADD FILES /FILE=*
@@ -24,8 +31,10 @@ ADD FILES /FILE=*
 EXECUTE.
 
 
+*3/ "Merge process" : ajouter les variables de la base GDP2010.csv
 
-* Ordonner les données par pays 
+
+*Etape 1: ordonner les id. pays de la base Macro2010_TD.sav
 
 SORT CASES BY Country (A).
 DATASET ACTIVATE DataSet1. 
@@ -33,11 +42,7 @@ SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-20
     'SPSS 2019_2020\Macro2010_TD.sav' 
  /COMPRESSED.
 
-
-
-
-
-* Importer les données en .csv 
+*Etape 2: importer les données en .csv 
 
 GET DATA
   /TYPE=TXT
@@ -60,8 +65,13 @@ CACHE.
 EXECUTE.
 DATASET NAME DataSet2 WINDOW=FRONT.
 
+*Etape 3 : sauvegarder la base GDP2010 en .sav
+
 SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS 2019_2020\GDP2010.sav'
   /COMPRESSED.
+  
+*Etape 4 : ordonner les id. pays de la base GDP2010.sav
+
 SORT CASES BY Country (A).  
 DATASET ACTIVATE DataSet2. 
 SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES '+ 
@@ -70,7 +80,7 @@ SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-20
 DATASET CLOSE DataSet2.
 
 
-* Fonction 'merge' : ajouter des variables d'une autre base de données
+*Etape 5 : tout est ok pour "merger les données" : ajouter des variables d'une autre base de données
 
 DATASET ACTIVATE DataSet1.
 MATCH FILES /TABLE=*
@@ -82,27 +92,104 @@ SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-20
   /COMPRESSED.
 
 
-* Tableau Variables
+
+*4/ Dictionnaire Variables
 
 DISPLAY DICTIONARY.
 
-* De String à Numeric pour les variables Vulnerable Socprotection_exp
+*Correction 1 : de String à Numeric pour les variables Vulnerable Socprotection_exp
 
 ALTER TYPE Vulnerable Socprotection_exp (f1.2).
 
-* Recodage automatique des modalités des variables Region, HDI et OECD
+*Correction 2 : renommer les variables VAR00...
 
+RENAME VARIABLES (VAR00345 VAR00346 = HealthExp Poverty2USD).
+EXECUTE.
+ 
+ 
+*5/ Missing Variables sur les variables indiquant le nombre de doc. d'import/export
+ 
+RECODE Doc_exp Doc_imp (999=SYSMIS).
+EXECUTE.
+
+
+*6/ Recodage automatique des modalités des variables Region, HDI et OECD
 
 AUTORECODE VARIABLES=Region HDI OECD 
   /INTO REGION_RECODE HDI_RECODE OECD_RECODE
   /PRINT.
   
-  * Recodage des modalités
+DELETE VARIABLES REGION HDI OECD.
+EXECUTE. 
+ 
+RENAME VARIABLES (REGION_RECODE HDI_RECODE OECD_RECODE = REGION HDI OECD).
+EXECUTE.
+
   
-  RECODE HDI (1=4).
+   
+*7/ Recodage des modalités
+  
+RECODE HDI (1=4).
 EXECUTE.
 
 
-  
-  
+
+*8/ Construction de variables 
+
+COMPUTE GDPcap=GDP_2010/Pop2010.
+EXECUTE.
+
+COMPUTE Density=Pop2010/Land.
+EXECUTE.
+
+
+
+*9/ Attribution de labels à des modalités
+
+VALUE LABELS Dec_Co2 Dec_Methane Int_energy Ener_cons Transp_green Ener_diversity 1 "Yes" 0 "No"
+EXECUTE.
+
+
+ 
+ *10/ Indicateur composite de législation pro-transition verte
+
+*A/ non-pondéré
+COMPUTE Env_policies= (Dec_Co2 + Dec_Methane + Int_energy + Ener_cons + Transp_green + Ener_diversity)/6.
+EXECUTE.
+
+*B/ pondéré
+COMPUTE Env_policies_2= (Co2*Dec_Co2 + (Methane/1000)*Dec_Methane + Int_energy + Ener_cons + Transp_green + Ener_diversity).
+EXECUTE.
+
+
+
+*11/ Création d'une variable discrétisée CATWB
+
+IF  (GDPcap < 1000) CATWB=0.
+IF (GDPcap >= 1000 & GDPcap<4000) CATWB=1.
+IF (GDPcap >= 4000 & GDPcap<12400) CATWB=2.
+IF  (GDPcap >= 12400) CATWB=3.
+EXECUTE.
+
+VALUE LABELS CATWB 0 "Lower income" 1 "Lower middle income" 2 "Upper middle income" 3 "High income".
+EXECUTE.
+
+
+
+*12/ Supprimer les variables demandées
+
+DELETE VARIABLES Physicians Forest.
+EXECUTE.
+
+
+*13/ Retenir (sélectionner) uniquement les pays avec plus de 450 000 hab.
+
+SELECT IF Pop2010>450000.
+EXECUTE.
+
+
+*14/ Sauvegarde finale
+
+SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS 2019_2020\Macro2010_TD1.sav'
+  /COMPRESSED.
 
