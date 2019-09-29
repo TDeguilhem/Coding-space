@@ -184,6 +184,14 @@ EXECUTE.
 
 *13/ Retenir (sélectionner) uniquement les pays avec plus de 450 000 hab.
 
+
+IF Pop2010>450000 POP_2010 = 1.
+FILTER by POP_2010.
+FILTER OFF.
+
+DELETE VARIABLES POP_2010.
+EXECUTE.
+
 SELECT IF Pop2010>450000.
 EXECUTE.
 
