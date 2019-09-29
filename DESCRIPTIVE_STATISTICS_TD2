@@ -1,1 +1,288 @@
+*
+*
+*Codes pour le TD n°2 réalisé à la séance n°4 (30/09/2019).
+*
+*
+*
 
+*1/ Ouvrir le fichier Macro2010_TD1.sav et enregistrer sous Macro2010_TD2.sav
+
+
+*A/ Ouvrir
+
+GET
+  FILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS '+
+    '2019_2020\Macro2010_TD1.sav'.
+DATASET NAME DataSet1 WINDOW=FRONT.
+
+*B/ Sauvegarder
+
+SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS 2019_2020\Macro2010_TD2.sav'
+  /COMPRESSED.
+
+
+
+*2/ Déterminer graphiquement quelle est la proportion de pays au sein de chaque région présentant un taux croissance du PIB élevé (supérieur à 5%) en 2010
+
+IF (GDP_growth>5) HIGH_GRO = 1.
+IF  (GDP_growth<5) HIGH_GRO = 0.
+IF (GDP_growth=5) HIGH_GRO = 0.
+EXECUTE.
+
+VALUE LABELS HIGH_GRO 1 "High GDP growth (> 5%)" 0 "Low GDP growth (=< 5%)".
+EXECUTE.
+
+GRAPH
+  /BAR(GROUPED)=PCT BY REGION BY HIGH_GRO.
+
+
+
+
+*3/ Combien de pays développés appartiennent à la catégorie « croissance du PIB élevée » ? Quels sont ces pays ?
+
+COMPUTE FILTER_DPED_HG = (REGION = 2 &  HIGH_GRO=1).
+EXECUTE.
+FILTER BY FILTER_DPED_HG.
+EXECUTE.
+FREQUENCIES Country.
+EXECUTE.
+
+FILTER OFF.
+
+
+
+*4/ Faire désormais apparaitre la proportion de pays présentant un taux croissance du PIB élevé dans un diagramme en secteurs circulaires pour chaque région.
+
+
+GRAPH
+  /PIE=PCT BY HIGH_GRO
+  /PANEL ROWVAR=REGION ROWOP=CROSS.
+
+
+GRAPH
+  /PIE=PCT BY HIGH_GRO
+  /PANEL COLVAR=REGION ROWOP=CROSS.
+
+
+
+*5/ Parmi les différentes régions, quelle est la proportion de pays ayant un IDH élevé, moyen et faible ? Parmi les pays ayant un IDH élevé, moyen et faible quelle proportion représente chaque région ? Présenter vos résultats sous la forme d’un tableau. Commenter.
+
+CROSSTABS
+  /TABLES=REGION BY HDI
+  /FORMAT=AVALUE TABLES
+  /CELLS=COUNT ROW COLUMN TOTAL 
+  /COUNT ROUND CELL.
+
+
+
+
+
+*6/A l’aide d’un diagramme approprié comparer la proportion de pays des différentes classes d’IDH en fonction des catégories de PIB/habitant établies par la Banque mondiale (CATWB). Modifier manuellement le graphique pour le rendre clair et lisible.
+
+*Menu --> Chart Builder.
+
+
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=CATWB COUNT()[name="COUNT"] HDI MISSING=LISTWISE 
+    REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: CATWB=col(source(s), name("CATWB"), unit.category())
+  DATA: COUNT=col(source(s), name("COUNT"))
+  DATA: HDI=col(source(s), name("HDI"), unit.category())
+  GUIDE: axis(dim(1), label("CATWB"))
+  GUIDE: axis(dim(2), label("Percent"))
+  GUIDE: legend(aesthetic(aesthetic.color.interior), label("HDI"))
+  SCALE: cat(dim(1), include(",00", "1,00", "2,00", "3,00"))
+  SCALE: linear(dim(2), include(0))
+  SCALE: cat(aesthetic(aesthetic.color.interior), include("2", "3", "4"))
+  ELEMENT: interval.stack(position(summary.percent(CATWB*COUNT, base.coordinate(dim(1)))), 
+    color.interior(HDI), shape.interior(shape.square))
+END GPL.
+
+
+
+
+
+
+
+*7/ A l’aide du même type de diagramme, comparer désormais la proportion de pays au sein des différentes catégories de PIB/habitant établies par la Banque mondiale en fonction des classes d’IDH.
+
+
+* Menu --> Chart Builder
+
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=HDI COUNT()[name="COUNT"] CATWB MISSING=LISTWISE 
+    REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: HDI=col(source(s), name("HDI"), unit.category())
+  DATA: COUNT=col(source(s), name("COUNT"))
+  DATA: CATWB=col(source(s), name("CATWB"), unit.category())
+  GUIDE: axis(dim(1), label("HDI"))
+  GUIDE: axis(dim(2), label("Percent"))
+  GUIDE: legend(aesthetic(aesthetic.color.interior), label("CATWB"))
+  SCALE: cat(dim(1), include("2", "3", "4"))
+  SCALE: linear(dim(2), include(0))
+  SCALE: cat(aesthetic(aesthetic.color.interior), include(",00", "1,00", "2,00", "3,00"))
+  ELEMENT: interval.stack(position(summary.percent(HDI*COUNT, base.coordinate(dim(1)))), 
+    color.interior(CATWB), shape.interior(shape.square))
+END GPL.
+
+
+
+
+*9/ Profils R&D AMLAT vs. Asie du Sud-Est
+
+
+IF (REGION =3 | REGION = 5) REG_R_D = 1.
+FILTER BY REG_R_D.
+EXAMINE VARIABLES=Patent R_D BY REGION
+  /PLOT NONE
+  /PERCENTILES(5,10,25,50,75,90,95) HAVERAGE
+  /STATISTICS DESCRIPTIVES
+  /CINTERVAL 95
+  /MISSING LISTWISE
+  /NOTOTAL.
+FILTER OFF.
+
+
+
+
+*10/ New var.TOP10% de la R_D
+
+
+EXAMINE VARIABLES= R_D BY REGION
+  /PLOT NONE
+  /PERCENTILES(5,10,25,50,75,90,95) HAVERAGE
+  /STATISTICS DESCRIPTIVES
+  /CINTERVAL 95
+  /MISSING LISTWISE
+  /NOTOTAL.
+
+IF (REGION=1 & R_D > 0.41) TOP10_RD = 1.
+IF (REGION=2 & R_D > 2.81) TOP10_RD = 1.
+IF (REGION=3 & R_D > 0.6) TOP10_RD = 1. 
+IF (REGION=4 & R_D > 3.26) TOP10_RD = 1.
+IF (REGION=5 & R_D > 1.75) TOP10_RD = 1.
+RECODE TOP10_RD (SYSMIS=0).
+
+
+
+
+*11/ Hétérogénéité émissions de Co2
+
+
+EXAMINE VARIABLES= Co2 BY REGION
+  /PLOT NONE
+  /STATISTICS DESCRIPTIVES.
+  
+* --> ATTENTION : pas de comparaison possible : calcul du CV obligatoire
+
+
+
+
+*12/ Intervalle interquartiles par région
+
+
+EXAMINE VARIABLES= Co2 BY REGION
+  /PLOT NONE
+  /STATISTICS DESCRIPTIVES.
+
+
+
+
+
+*13/ Histogramme CO2 pays de l'OCDE
+
+
+
+GRAPH
+  /HISTOGRAM=Co2
+  /PANEL ROWVAR=OECD ROWOP=CROSS.
+
+
+FILTER BY OECD.
+GRAPH
+ /HISTOGRAM=Co2.
+FILTER OFF.
+
+
+
+
+
+
+
+*14/ Déterminer graphiquement quelle est la proportion de pays de l’échantillon qui émettent au maximum 10 tonnes de Co2 par habitant en 2010 ? Toujours graphiquement, quelle est la valeur maximale des émissions pour les 60% de pays qui émettent le moins ? Commenter.
+
+GRAPH
+  /LINE(MULTIPLE)=CUPCT BY Co2.
+  
+  
+
+
+*15/ Refaire la question précédente en comparant les pays de l’OCDE et les autres.
+
+
+GRAPH
+  /LINE(MULTIPLE)=CUPCT BY Co2BY OECD.
+  
+  
+  
+  
+*16/ Parmi les pays de l’OCDE, donner les trois économies qui émettent le plus de Co2 en tonnes/habitant. Combien de tonnes de Co2 ont été émises en 2010 aux Etats-Unis ? 
+
+
+
+
+IF (OECD=2) OECD_CAT=1.
+FILTER BY OECD_CAT.
+EXECUTE.
+EXAMINE VARIABLES=Co2 BY Country
+  /PLOT BOXPLOT STEMLEAF
+  /COMPARE GROUPS
+  /STATISTICS NONE
+  /CINTERVAL 95
+  /MISSING LISTWISE
+  /NOTOTAL.
+EXECUTE.
+FILTER OFF.
+
+IF (Country = "United States") USA=1.
+EXECUTE.
+
+COMPUTE CO2_OVERALL = Co2*Pop2010.
+EXECUTE.
+
+FILTER BY USA.
+FREQUENCIES CO2_OVERALL.
+EXECUTE.
+
+FILTER OFF.
+
+
+
+
+* Effacer --> les différents filtres utilisés
+
+
+DELETE VARIABLES HIGH_GRO FILTER_DPED_HG REG_R_D TOP10_RD OECD_CAT USA.
+EXECUTE.
+
+
+
+
+
+*17/ Sauvegarde finale
+
+
+SAVE OUTFILE='C:\Users\Thibaud\Desktop\TD_STAT_DESC_30092019\macro2010_td1.sav'
+  /COMPRESSED.
+
+  
+  
+  
+
+  
