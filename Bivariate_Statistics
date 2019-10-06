@@ -1,0 +1,404 @@
+*
+*
+*Codes pour le TD n°3 réalisé à la séance n°5 (07/10/2019).
+*
+*
+*
+
+*1/ Ouvrir le fichier Macro_merge_TD2.sav et enregistrer sous Macro2010_TD3.sav
+
+
+*A/ Ouvrir
+
+GET
+  FILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS '+
+    '2019_2020\Macro_merge_TD2.sav'.
+DATASET NAME DataSet1 WINDOW=FRONT.
+
+*B/ Sauvegarder
+
+SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS 2019_2020\Macro2010_TD3.sav'
+  /COMPRESSED.
+
+
+
+
+*2/ Créer une nouvelle variable (env_policies_STD) standardisant l'indicateur composite de politiques environnementales non-pondéré (cf. séance 1, variable env_policies).
+
+
+
+COMPUTE Env_policies= (Dec_Co2 + Dec_Methane + Int_energy + Ener_cons + Transp_green + Ener_diversity)/6.
+EXECUTE.
+
+
+*Distribution de cet indicateur.
+
+DESCRIPTIVES VARIABLES=Env_policies.
+EXECUTE.
+
+GRAPH
+  /HISTOGRAM=Env_policies.
+
+
+*Creation de la VAR standardisee : 2 methode
+
+
+* Methode 1
+
+COMPUTE env_policies_STD=(Env_policies - 0.3978)/0.42614.
+EXECUTE.
+
+DELETE VARIABLES Env_policies_STD.
+
+
+
+* Methode 2
+
+
+DESCRIPTIVES VARIABLES=Env_policies
+  /SAVE
+  /STATISTICS=MEAN STDDEV MIN MAX KURTOSIS SKEWNESS.
+
+RENAME VARIABLES (ZEnv_policies = env_policies_STD).
+EXECUTE.
+
+
+
+* Distribution de l'indicateur standardise
+
+DESCRIPTIVES VARIABLES=env_policies_STD.
+EXECUTE.
+
+GRAPH
+  /HISTOGRAM=env_policies_STD.
+
+
+
+
+
+*3/ Existe-t-il une relation de dépendance entre la région d'appartenance et le niveau de développement humain pour les pays n'appartenant pas à l'OCDE ? 
+
+
+* Bar Chart "stacked"
+
+IF (OECD=1) OECD_CAT=1.
+FILTER BY OECD_CAT.
+EXECUTE.
+
+* Outil graphique (clique-bouton)
+
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=REGION COUNT()[name="COUNT"] HDI MISSING=LISTWISE 
+    REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: REGION=col(source(s), name("REGION"), unit.category())
+  DATA: COUNT=col(source(s), name("COUNT"))
+  DATA: HDI=col(source(s), name("HDI"), unit.category())
+  GUIDE: axis(dim(1), label("REGION"))
+  GUIDE: axis(dim(2), label("Percent"))
+  GUIDE: legend(aesthetic(aesthetic.color.interior), label("HDI"))
+  SCALE: cat(dim(1), include("1", "2", "3", "4", "5"))
+  SCALE: linear(dim(2), include(0))
+  SCALE: cat(aesthetic(aesthetic.color.interior), include("2", "3", "4"))
+  ELEMENT: interval.stack(position(summary.percent(REGION*COUNT, base.coordinate(dim(1)))), 
+    color.interior(HDI), shape.interior(shape.square))
+END GPL.
+
+
+
+* Relation entre 2 variables qualitatives : n_obs vs. n_exp. / Chi^2 / Phi (V de Cramer) / Résidus ajustés et standardisés
+
+
+
+
+CROSSTABS
+  /TABLES=REGION BY HDI
+  /FORMAT=AVALUE TABLES
+  /STATISTICS=CHISQ PHI 
+  /CELLS=COUNT ROW COLUMN TOTAL.
+
+CROSSTABS
+  /TABLES=REGION BY HDI
+  /FORMAT=AVALUE TABLES
+  /STATISTICS=CHISQ PHI 
+  /CELLS=COUNT EXPECTED ASRESID.
+  
+  FILTER OFF.
+
+
+
+
+
+
+*4/ Existe-t-il une relation de dépendance entre le niveau de développement humain et le fait d'appartenir à la catégorie « croissance du PIB élevée »pour les pays d'Amérique latine et d'Asie du Sud et de l'Est qui n'appartiennent pas à l'OCDE ?
+
+
+IF (GDP_growth>5) HIGH_GRO = 1.
+IF  (GDP_growth<5) HIGH_GRO = 0.
+IF (GDP_growth=5) HIGH_GRO = 0.
+EXECUTE.
+
+VALUE LABELS HIGH_GRO 1 "High GDP growth (> 5%)" 0 "Low GDP growth (=< 5%)".
+EXECUTE.
+
+
+
+IF (REGION =3 & OECD=1 | REGION = 5 & OECD=1) REG_OECD = 1.
+FILTER BY REG_OECD.
+EXECUTE.
+
+
+* Outil graphique (clique-bouton)
+
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=REGION COUNT()[name="COUNT"] HIGH_GRO 
+    MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: REGION=col(source(s), name("REGION"), unit.category())
+  DATA: COUNT=col(source(s), name("COUNT"))
+  DATA: HIGH_GRO=col(source(s), name("HIGH_GRO"), unit.category())
+  GUIDE: axis(dim(1), label("REGION"))
+  GUIDE: axis(dim(2), label("Percent"))
+  GUIDE: legend(aesthetic(aesthetic.color.interior), label("HIGH_GRO"))
+  SCALE: cat(dim(1), include("1", "2", "3", "4", "5"))
+  SCALE: linear(dim(2), include(0))
+  SCALE: cat(aesthetic(aesthetic.color.interior), include(",00", "1,00"))
+  ELEMENT: interval.stack(position(summary.percent(REGION*COUNT, base.coordinate(dim(1)))), 
+    color.interior(HIGH_GRO), shape.interior(shape.square))
+END GPL.
+
+
+CROSSTABS
+  /TABLES=HIGH_GRO BY HDI
+  /FORMAT=AVALUE TABLES
+  /STATISTICS=CHISQ PHI 
+  /CELLS=COUNT ROW COLUMN TOTAL.
+
+CROSSTABS
+  /TABLES=HIGH_GRO BY HDI
+  /FORMAT=AVALUE TABLES
+  /STATISTICS=CHISQ PHI 
+  /CELLS=COUNT EXPECTED ASRESID.
+
+  FILTER OFF.
+
+
+
+
+*5/ A l'aide de graphiques adaptés, analyser et comparer graphiquement la distribution des émissions de Co2 par habitant entre les pays latino-américains, africains et d'Asie du Sud et de l’Est (médiane, percentiles 25 et 75, intervalle inter-quartiles).
+
+
+
+IF (REGION =1 | REGION =3 | REGION =5) REG_FILT = 1.
+FILTER BY REG_FILT.
+EXECUTE.
+
+
+EXAMINE VARIABLES=Co2 BY REGION
+  /PLOT=BOXPLOT
+  /STATISTICS.
+
+FILTER OFF.
+
+
+
+
+*6/ Graphiquement, la distribution des émissions de Co2 par habitant dans les pays de l'OCDE vous semble-telle normale ? Même question en retirant les 10% de pays qui émettent le plus.
+
+
+
+
+
+
+IF (OECD=2) OECD_CAT2=1.
+FILTER BY OECD_CAT2.
+EXECUTE.
+
+
+* Tous les pays de l'OCDE
+
+GRAPH
+  /HISTOGRAM(NORMAL)=Co2.
+
+
+* Retirer les 10% qui consomment le plus
+
+
+
+EXAMINE VARIABLES=Co2
+  /PLOT NONE
+  /PERCENTILES(90) HAVERAGE
+  /STATISTICS.
+  
+  FILTER OFF.
+  
+  
+IF (OECD=2 & Co2<16) OECD_CAT3=1.
+FILTER BY OECD_CAT3.
+EXECUTE.
+  
+
+GRAPH
+  /HISTOGRAM(NORMAL)=Co2.
+
+FILTER OFF.
+
+
+*7/ Représenter et analyser graphiquement la distribution de la variable Cell, puis GDPcap.
+
+
+
+GRAPH
+  /HISTOGRAM(NORMAL)=Cell.
+  
+EXAMINE VARIABLES=Cell
+  /PLOT=BOXPLOT
+ /STATISTICS.
+
+
+
+GRAPH
+  /HISTOGRAM(NORMAL)=GDPcap.
+  
+EXAMINE VARIABLES=GDPcap
+  /PLOT=BOXPLOT
+ /STATISTICS.
+
+
+
+*8/ Effectuer les mêmes représentations graphiques en retirant les 25% de valeurs extrêmes dans chacune des deux variables (en queue de distribution).
+
+EXAMINE VARIABLES=Cell
+  /PLOT=NONE
+ /PERCENTILES(75) HAVERAGE 
+ /STATISTICS=NONE.
+  
+  
+ * V_P75 = 117,75 
+ 
+ IF (Cell <117.75) Cell_25 = 1.
+ FILTER BY Cell_25.
+ EXECUTE.
+
+
+GRAPH
+  /HISTOGRAM(NORMAL)=Cell.
+  
+EXAMINE VARIABLES=Cell
+  /PLOT=BOXPLOT
+ /STATISTICS.
+  
+ FILTER OFF. 
+
+
+
+
+
+  
+EXAMINE VARIABLES=GDPcap
+  /PLOT=NONE
+ /PERCENTILES(75) HAVERAGE 
+ /STATISTICS=NONE
+  /NOTOTAL.
+
+
+
+ * V_P75 = 15840,4427
+ 
+ IF (GDPcap <15840.4427) GDPcap_25 = 1.
+ FILTER BY GDPcap_25.
+ EXECUTE.
+
+
+GRAPH
+  /HISTOGRAM(NORMAL)=GDPcap.
+  
+EXAMINE VARIABLES=GDPcap
+  /PLOT=BOXPLOT
+ /STATISTICS.
+
+ FILTER OFF. 
+
+
+
+*9/ Quels types de transformation pouvons-nous effectuer sur la variable GDPcap afin de faciliter l'analyse de sa distribution ? Comparer avant et après transformation à l'aide de graphiques adaptés.
+
+
+* Passage en LOG 
+
+COMPUTE LN_GDPcap=LN(GDPcap).
+EXECUTE.
+
+* Comparaison
+
+GRAPH
+  /HISTOGRAM(NORMAL)=LN_GDPcap.
+GRAPH
+  /HISTOGRAM(NORMAL)=GDPcap. 
+
+
+EXAMINE VARIABLES=LN_GDPcap GDPcap
+  /PLOT=BOXPLOT
+ /STATISTICS.
+
+
+
+
+
+*10/ Représenter graphiquement le nuage de points mettant en relation le logarithme du PIB/hab (Y) et le nombre d'abonnements téléphoniques pour 100 habitants (X).
+
+
+GRAPH
+  /SCATTERPLOT(BIVAR)=Cell WITH LN_GDPcap
+  /MISSING=LISTWISE.
+  
+  
+  
+*11/ Pour chacune des régions, représenter graphiquement le croisement entre la croissance du PIB (Y) et le nombre d'abonnements téléphoniques pour 100 habitants (X).
+
+
+GRAPH
+  /SCATTERPLOT(BIVAR)=Cell WITH LN_GDPcap
+  /PANEL ROWVAR=REGION ROWOP=CROSS
+  /MISSING=LISTWISE.
+  
+  
+GRAPH
+  /SCATTERPLOT(BIVAR)=Cell WITH LN_GDPcap BY REGION
+  /MISSING=LISTWISE.
+  
+
+
+  
+* 12/ Interpréter le sens et l'intensité de la corrélation entre les variables suivantes : Cell , Elecrural , GDPcap, Poverty.
+  
+  
+  
+CORRELATIONS
+  /VARIABLES=Cell Elecrural GDPcap Poverty2USD
+  /PRINT=TWOTAIL NOSIG
+  /STATISTICS DESCRIPTIVES XPROD
+  /MISSING=PAIRWISE.
+  
+  
+  
+ 
+ * Supprimer les différents filtres utilisés : 
+ 
+ 
+DELETE VARIABLES OECD_CAT HIGH_GRO REG_OECD REG_FILT OECD_CAT2 OECD_CAT3 Cell_25 GDPcap_25. 
+
+ *13/ Sauvegarde finale
+
+
+SAVE OUTFILE='C:\Users\Thibaud\Desktop\TD_STAT_DESC_30092019\macro2010_seance4.sav'
+  /COMPRESSED.
+
+
+
+
+
