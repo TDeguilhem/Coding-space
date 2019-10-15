@@ -1,0 +1,198 @@
+*
+* Formulaire des 3 premiers TD 
+*
+
+
+
+*
+* COMMANDES DE BASE (communes aux différents TD)
+*
+
+
+* Ouvrir un jeu de données
+
+GET
+  FILE='[chemin]'.
+WINDOW=FRONT.
+
+* Sauvegarder
+
+SAVE OUTFILE='[chemin]'
+  /COMPRESSED.
+
+* Dictionnaire des variables
+
+DISPLAY DICTIONARY.
+
+
+* Filtrer des données --> sélectionner un sous-jeu de données
+
+FILTER by [VARIABLE --> MODALITE==1].
+
+* Reconsidérer l'intégralité des données (après avoir utilisé un filtre)
+
+FILTER OFF.
+
+
+
+
+
+*
+* DATA MANAGEMENT
+*
+
+
+* Ajouter des observations (provenant d'un autre jeu de données)
+
+ADD FILES /FILE=*
+  /FILE='[chemin vers la seconde base de données]'.
+EXECUTE.
+
+
+* Ajouter des variables à un jeu de données n°1 (provenant d'un autre jeu de données n°2) : 3 étapes
+
+* --> Etapes 1 : ordonner les identifiants de la base n°1
+
+SORT CASES BY [IDENTIFIANT DE LA BASE DE DONNEES 1].
+SAVE OUTFILE='[chemin de la base 1]' 
+ /COMPRESSED.
+
+* --> Etapes 2 : ordonner les identifiants de la base n°2
+
+SORT CASES BY [IDENTIFIANT DE LA BASE DE DONNEES 2].
+SAVE OUTFILE='[chemin vers la base 2]' 
+ /COMPRESSED.
+ 
+* --> Etapes 3 : merge base 1 et 2 grâce aux identifiants [clé d'appariement]
+  
+ MATCH FILES /TABLE=*
+  /FILE='[chemin vers la base de données 2]'
+  /BY [IDENTIFIANT --> Les mêmes dans la base 1 et 2].
+EXECUTE.
+SAVE OUTFILE='[chemin vers la nouvelle base merge des deux jeux de données'
+  /COMPRESSED.
+  
+
+*  "Destring" des variables : passer d'une variable texte à une variable numérique
+
+ALTER TYPE [VARIABLES STRING A PASSER EN NUMERIQUE] (f[CHIFFRAGE].[DECIMALE]).
+EXECUTE.
+
+
+*  Renommer une variable : changer le nom
+
+RENAME VARIABLES ([NOMS DES VARIABLES] = [NOUVEAUX NOMS DES VARIABLES]).
+EXECUTE.
+
+
+* Recoder des modalités
+
+RECODE [VARIABLES CONCERNEES] ([MODALITES A RECODER]=[NOUVELLES MODALITES]).
+EXECUTE.
+
+
+* Recoder automatique des modalités au sein d'une variable texte "string"
+
+AUTORECODE VARIABLES=[VARIABLES A RECODER AUTOMATIQUEMENT] 
+  /INTO [NOUVELLES VARIABLES APRES RECODAGE]
+  /PRINT.
+
+
+* Renommer des modalités
+
+VALUE LABELS [NOMS DES VARIABLES AVEC MODALITES A RENOMMER] [NUMERO DE LA MODALITE] "[NOM]".
+EXECUTE.
+
+
+* Créer une nouvelle variable (arithmétique)
+
+COMPUTE [NOUVELLE VARIABLE]= [FORMULATION ENTRE UNE OU PLUSIEURS VARIABLES].
+EXECUTE.
+
+
+
+* Créer une nouvelle variable (arithmétique)
+
+COMPUTE [NOUVELLE VARIABLE]= [FORMULATION ENTRE UNE OU PLUSIEURS VARIABLES].
+EXECUTE.
+
+
+
+* Supprimer des variables du jeu de données
+
+DELETE VARIABLES [VARIABLES A SUPPRIMER].
+EXECUTE. 
+  
+ 
+ 
+* Créer une variable à partir d'une condition sur une autre variable
+  
+IF  ([NOM DE LA VARIABLE] [CONDITION] [& | SI NECESSAIRE EN CAS DE COMBINAISON AVEC UNE AUTRE CONDITION]) [NOUVELLE VARIABLE]=[MODALITE CODEE].
+EXECUTE.
+ 
+ 
+* Supprimer les observations qui ne respectent pas une certaine condition
+
+SELECT IF [VARIABLES ET CONDITIONS AVEC & et | SI NECESSAIRE].
+EXECUTE.
+ 
+ 
+ 
+
+
+*
+* UNIVARIATE STATISTICS
+*
+ 
+ 
+* 1 - Variables qualitatives
+
+* Tableau de distribution des fréquences (effectifs et proportions) variable par variable
+
+FREQUENCIES [VARIABLES].
+EXECUTE.
+
+
+
+* Tableau de distribution des fréquences conditionnelles (une variable en fonction d'une autre)
+
+
+CROSSTABS
+  /TABLES=[VARIABLE 1] BY [VARIABLE 2]
+  /FORMAT=AVALUE TABLES
+  /CELLS=[OPTION PAR CELLULE : EFFECTIF --> COUNT , PROPORTIONS EN LIGNE EN EN COLONNE --> ROW COLUMN]. 
+
+
+
+* Diagramme circulaire (Pie Chart)
+
+GRAPH
+  /PIE=[OPTION : SI EN PROPORTIONS --> PCT, SI EN EFFECTIFS --> COUNT] BY [VARIABLE]
+ 
+
+
+* Diagramme en bâtons (Bar Chart)
+
+GRAPH
+  /BAR=[OPTION : SI EN PROPORTIONS --> PCT, SI EN EFFECTIFS --> COUNT] BY [VARIABLE]
+  
+ 
+ 
+* Diagramme en bâtons (Bar Chart) pour distributions conditionnelles
+
+GRAPH
+  /BAR(GROUPED)=[OPTION : SI EN PROPORTIONS --> PCT, SI EN EFFECTIFS --> COUNT] BY [VARIABLE] BY [VARIABLE].
+  
+    
+* Diagramme en bâtons (Bar Chart) "stacked" ou empilé pour distributions conditionnelles
+
+* MENU --> GRAPHIQUE --> CONSTRUCTION DE GRAPHIQUES
+
+
+
+
+ 
+ 
+ 
+ 
+ 
