@@ -1,0 +1,30 @@
+* Application : ACP 
+
+
+
+* Z_scores des variables concernées
+
+
+DESCRIPTIVES  Life_exp_women Life_exp_men Anemia_preg_women Poverty2USD Vulnerable Socprotection_exp 
+    Elecrural HealthExp
+    /SAVE.
+    
+
+* ACP
+
+
+FACTOR
+  /VARIABLES Life_exp_women Life_exp_men Anemia_preg_women Poverty2USD Vulnerable Socprotection_exp 
+    Elecrural HealthExp
+  /MISSING LISTWISE 
+  /ANALYSIS Life_exp_women Life_exp_men Anemia_preg_women Poverty2USD Vulnerable Socprotection_exp 
+    Elecrural HealthExp
+  /PRINT UNIVARIATE INITIAL CORRELATION SIG KMO EXTRACTION ROTATION FSCORE
+  /PLOT EIGEN ROTATION
+  /CRITERIA MINEIGEN(1) ITERATE(25)
+  /EXTRACTION PC
+  /CRITERIA ITERATE(25)
+  /ROTATION VARIMAX
+  /SAVE BART(ALL)
+  /METHOD=CORRELATION.
+
