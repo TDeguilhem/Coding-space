@@ -1,0 +1,186 @@
+* Correction TEST 1
+
+
+
+* 1/ Indicateur composite de richesse matérielle du ménage
+
+COMPUTE hh_wealth = own_generator + own_vehicle + own_tv + own_AC + own_cell + own_refri + own_washing + own_computer + own_microwave.
+
+VARIABLE LABELS hh_wealth "Material wealth".
+
+* Mesure : ORDINAL
+* Option graphique 
+
+GRAPH
+  /HISTOGRAM=hh_wealth.
+
+* Analyse des valeurs de tendance centrale/position 
+
+EXAMINE VARIABLES = hh_wealth
+ /PLOT NONE
+  /PERCENTILES(90) HAVERAGE
+  /STATISTICS DESCRIPTIVES.
+EXECUTE.
+
+
+*2/ Unir les modalités de la variable education
+
+RECODE education (7=6).
+
+*Vérification 
+
+FREQUENCIES VARIABLES = education.
+EXECUTE.
+
+
+* Dans la vue des variables : modifier les valeurs des modalités education --> supprimer 7 et rennomer 6 "Graduate/postgraduate"
+
+
+*3/ Renommer les variables AP8 et AP5
+
+
+RENAME VARIABLES (AP8 AP5 = Weight Height). 
+
+
+
+* 4/ Ne conserver que les individus age>=18
+
+SELECT IF age>17.
+EXECUTE.
+
+
+*5/ Création de la variable BMI
+
+COMPUTE BMI = (Weight/(Height*Height))*10000.
+
+VARIABLE LABELS BMI "Body Mass Index".
+
+
+
+*6/ Analyse graphique de la distribution avec filtre
+
+IF (BMI<45) BMI_FILTER = 1.
+FILTER BY BMI_FILTER.
+EXECUTE.
+
+
+GRAPH
+  /LINE(MULTIPLE)=CUPCT BY BMI BY urban.
+
+
+
+
+
+*7/ 
+
+EXAMINE VARIABLES=BMI BY hh_wealth
+  /PLOT=BOXPLOT
+  /STATISTICS=NONE
+  /NOTOTAL.
+
+
+FILTER OFF.
+
+
+
+*8/ Création d'une variable discrétisée BMI_class
+
+IF  (BMI >=13 & BMI < 19) BMI_class=0.
+IF (BMI >=19 & BMI < 25) BMI_class=1.
+IF (BMI >=25  & BMI< 45) BMI_class=2.
+EXECUTE.
+
+VALUE LABELS BMI_class 0 "Underweight" 1 "Normal weight" 2 "Overweight".
+EXECUTE.
+
+VARIABLE LABELS BMI_class "WHO classification of BMI".
+
+
+
+
+
+*9/ Distribution des catégories de BMI en fonction de l'éducation
+
+
+
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=education COUNT()[name="COUNT"] BMI_class 
+    MISSING=LISTWISE REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE.
+BEGIN GPL
+  SOURCE: s=userSource(id("graphdataset"))
+  DATA: education=col(source(s), name("education"), unit.category())
+  DATA: COUNT=col(source(s), name("COUNT"))
+  DATA: BMI_class=col(source(s), name("BMI_class"), unit.category())
+  GUIDE: axis(dim(1), label("HQ19 11.4,6 Education: Completed Years, 7cats"))
+  GUIDE: axis(dim(2), label("Percent"))
+  GUIDE: legend(aesthetic(aesthetic.color.interior), label("WHO classification of BMI"))
+  SCALE: cat(dim(1), include("0", "1", "2", "3", "4", "5", "6"))
+  SCALE: linear(dim(2), include(0))
+  SCALE: cat(aesthetic(aesthetic.color.interior), include(",00", "1,00", "2,00"))
+  ELEMENT: interval.stack(position(summary.percent(education*COUNT, base.coordinate(dim(1)))), 
+    color.interior(BMI_class), shape.interior(shape.square))
+END GPL.
+
+
+
+
+*10/ Tableau croisé BMI_class et variable urban
+
+CROSSTABS
+  /TABLES=BMI_class BY urban
+  /FORMAT=AVALUE TABLES
+  /CELLS=COUNT ROW COLUMN TOTAL 
+  /COUNT ROUND CELL.
+
+
+
+
+*11/ Association entre 2 variables qualitatives : Residus stand/ajust + Chi2 ou V de Cramer
+
+CROSSTABS
+  /TABLES=BMI_class BY urban
+  /FORMAT=AVALUE TABLES
+  /STATISTICS=CHISQ PHI 
+  /CELLS=COUNT EXPECTED ASRESID.
+
+
+
+
+
+*12/ Description du salaire horaire
+
+EXAMINE VARIABLES = hourlywage BY sex BY urban
+ /PLOT NONE
+  /PERCENTILES(90) HAVERAGE
+  /STATISTICS DESCRIPTIVES.
+EXECUTE.
+
+
+
+
+*13/ Coefficient de corrélation de Pearson entre le poids et le salaire horaire
+
+FILTER BY BMI_FILTER.
+EXECUTE.
+CORRELATIONS Weight hourlywage.
+
+
+
+
+
+*14/ Nuage de points et droite d'ajustement
+
+COMPUTE LNHourlywage = LN(hourlywage).
+
+GRAPH
+  /SCATTERPLOT(BIVAR)=Weight WITH LNHourlywage
+  /MISSING=LISTWISE.
+
+
+GRAPH
+  /SCATTERPLOT(BIVAR)=Weight WITH LNHourlywage BY sex
+  /MISSING=LISTWISE.
+
+
+FILTER OFF.
