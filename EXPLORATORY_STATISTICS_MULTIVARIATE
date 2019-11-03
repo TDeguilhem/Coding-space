@@ -5,6 +5,10 @@
 * Z_scores des variables concernées
 
 
+  FILTER BY OECD_CAT.
+EXECUTE.
+
+
 DESCRIPTIVES  Life_exp_women Life_exp_men Anemia_preg_women Poverty2USD Vulnerable Socprotection_exp 
     Elecrural HealthExp
     /SAVE.
