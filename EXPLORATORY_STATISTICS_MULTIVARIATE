@@ -6,6 +6,7 @@
 
 
 
+IF (OECD=1) OECD_CAT=1.
   FILTER BY OECD_CAT.
 EXECUTE.
 
