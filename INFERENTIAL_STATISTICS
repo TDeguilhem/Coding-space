@@ -1,0 +1,228 @@
+*
+*
+*Codes pour le TD n°3 réalisé à la séance n°6 (14/10/2019).
+*
+*
+*
+
+
+*1/ Ouvrir le fichier Macro_merge_TD2.sav et enregistrer sous Macro2010_TD3.sav
+
+
+*A/ Ouvrir
+
+GET
+  FILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS '+
+    '2019_2020\Macro_td3.sav'.
+DATASET NAME DataSet1 WINDOW=FRONT.
+
+*B/ Sauvegarder
+
+SAVE OUTFILE='C:\Users\Thibaud\Desktop\Enseignements\Universite de Paris 2019-2020\STATISTIQUES SPSS 2019_2020\Macro2010_TD4.sav'
+  /COMPRESSED.
+
+
+
+
+
+*2/ Peut-on dire que la relation de dépendance est significative entre la région d'appartenance et le niveau de développement humain pour les pays n'appartenant pas à l'OCDE ? Expliquer et commenter.
+
+
+IF (OECD=1) OECD_CAT=1.
+FILTER BY OECD_CAT.
+EXECUTE.
+
+
+CROSSTABS
+  /TABLES=REGION BY HDI
+  /FORMAT=AVALUE TABLES
+  /STATISTICS=CHISQ PHI 
+  /CELLS=COUNT EXPECTED ASRESID.
+  
+  FILTER OFF.
+
+* Pour aller plus loin : http://spss.espaceweb.usherbrooke.ca/pages/statistiques-inferentielles/test-de-chi-2.php
+
+
+
+
+
+*3/ Même question pour la relation entre le niveau de développement humain et le fait d'appartenir à la catégorie « croissance du PIB élevée »pour les pays d'Amérique latine et d'Asie du Sud et de l'Est qui n'appartiennent pas à l'OCDE ? Expliquer et commenter.
+
+
+IF (GDP_growth>5) HIGH_GRO = 1.
+IF  (GDP_growth<5) HIGH_GRO = 0.
+IF (GDP_growth=5) HIGH_GRO = 0.
+EXECUTE.
+
+VALUE LABELS HIGH_GRO 1 "High GDP growth (> 5%)" 0 "Low GDP growth (=< 5%)".
+EXECUTE.
+
+
+IF (REGION =3 & OECD=1 | REGION = 5 & OECD=1) REG_OECD = 1.
+FILTER BY REG_OECD.
+EXECUTE.
+
+
+CROSSTABS
+  /TABLES=HIGH_GRO BY HDI
+  /FORMAT=AVALUE TABLES
+  /STATISTICS=CHISQ PHI 
+  /CELLS=COUNT EXPECTED ASRESID.
+
+FILTER OFF.
+
+* Pour aller plus loin : http://spss.espaceweb.usherbrooke.ca/pages/statistiques-inferentielles/test-de-chi-2.php
+
+
+
+
+
+
+
+*4/ Tester la normalité de la distribution des variables Cell , GDPcap et LN_GDPcap. Proposer une représentation graphique permettant de juger de la normalité.
+
+
+EXAMINE VARIABLES=Cell GDPcap LN_GDPcap
+  /PLOT BOXPLOT HISTOGRAM NPPLOT
+  /COMPARE GROUPS
+  /STATISTICS DESCRIPTIVES
+  /CINTERVAL 95
+  /MISSING LISTWISE
+  /NOTOTAL.
+  
+  
+  
+  
+  
+  
+*5/ Pour l'ensemble de l'échantillon, le nombre moyen d'abonnements téléphoniques est-il significativement différent de 100 au seuil de 5% ? Au seuil de 1%? Interpréter.
+
+
+T-TEST
+  /TESTVAL=100
+  /MISSING=ANALYSIS
+  /VARIABLES=Cell
+  /CRITERIA=CI(.95).
+  
+* Pour aller plus loin : http://spss.espaceweb.usherbrooke.ca/pages/stat-inferentielles/test-t-pour-echantillon-unique.php
+ 
+ 
+ 
+ 
+
+
+*6/ A l'aide de boîtes à moustaches comparer la distribution du nombre d'abonnements téléphoniques pour les pays appartenant ou non à l'OCDE. Commenter.
+  
+EXAMINE VARIABLES=Cell BY OECD
+  /PLOT=BOXPLOT
+  /STATISTICS=NONE
+  /NOTOTAL.
+
+
+
+
+*7/ Le nombre moyen d'abonnements téléphoniques est-il significativement différent entre les deux groupes de pays au seuil de 5% et 1% ? Commenter et représenter graphiquement.
+
+
+
+T-TEST GROUPS=OECD(1 2)
+  /MISSING=ANALYSIS
+  /VARIABLES=Cell
+  /CRITERIA=CI(.95).
+
+
+* Pour aller plus loin : http://spss.espaceweb.usherbrooke.ca/pages/stat-inferentielles/test-t-pour-echantillons-independants.php
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+*8/ A l'aide de boîtes à moustaches, comparer la distribution du nombre d'abonnements téléphoniques par région puis par catégories de revenu (Banque mondiale).
+ 
+ 
+
+EXAMINE VARIABLES=Cell BY REGION
+  /PLOT=BOXPLOT
+  /STATISTICS=NONE
+  /NOTOTAL.
+
+
+EXAMINE VARIABLES=Cell BY CATWB
+  /PLOT=BOXPLOT
+  /STATISTICS=NONE
+  /NOTOTAL.
+
+
+
+
+
+
+
+*9/ Analyser la variance du nombre d'abonnements téléphoniques selon les catégories de revenu (Banque mondiale). Que pouvez-vous dire ? Vous vous appuierez sur une représentation graphique adaptée.
+
+
+
+ONEWAY Cell BY CATWB
+  /STATISTICS DESCRIPTIVES HOMOGENEITY 
+  /PLOT MEANS
+  /MISSING ANALYSIS
+  /POSTHOC=BONFERRONI ALPHA(0.05).
+
+
+GRAPH
+  /BAR(SIMPLE)=MEAN(Cell) BY CATWB
+  /INTERVAL CI(95.0).
+  
+  
+  * Pour aller plus loin : http://spss.espaceweb.usherbrooke.ca/pages/statistiques-inferentielles/analyse-de-variance.php
+  
+  
+  
+  
+  
+*10/ Interpréter le sens, l'intensité et la significativité de la corrélation entre les variables suivantes : Cell , Elecrural, GDPcap, Poverty.
+  
+  
+CORRELATIONS
+  /VARIABLES=Cell Elecrural GDPcap Poverty2USD
+  /PRINT=TWOTAIL NOSIG
+  /STATISTICS DESCRIPTIVES
+  /MISSING=PAIRWISE.
+  
+  
+* Pour aller plus loin : http://spss.espaceweb.usherbrooke.ca/pages/stat-inferentielles/correlation.php
+
+
+
+
+
+
+
+*11/ Pouvons-nous dire qu'il existe une relation causale entre le nombre d'abonnements téléphoniques et le PIB par habitant ? Expliquer.
+
+
+* Arguments : https://www.tdeguilhem.com/uploads/4/8/6/5/48652267/corr%C3%A9lation_causalit%C3%A9_2019.pdf
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+*12/ Sauvegarde finale
+
+
+SAVE OUTFILE='C:\Users\Thibaud\Desktop\macro2010_seance8.sav'
+  /COMPRESSED.
+  
+  
+  
+  
+  
+  
+  
+  
