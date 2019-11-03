@@ -13,6 +13,10 @@ DESCRIPTIVES  Life_exp_women Life_exp_men Anemia_preg_women Poverty2USD Vulnerab
 * ACP
 
 
+  
+  FILTER BY OECD_CAT.
+EXECUTE.
+
 FACTOR
   /VARIABLES Life_exp_women Life_exp_men Anemia_preg_women Poverty2USD Vulnerable Socprotection_exp 
     Elecrural HealthExp
@@ -27,4 +31,5 @@ FACTOR
   /ROTATION VARIMAX
   /SAVE BART(ALL)
   /METHOD=CORRELATION.
-
+  
+  FILTER OFF.
