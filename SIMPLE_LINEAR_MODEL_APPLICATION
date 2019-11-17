@@ -1,0 +1,44 @@
+* Ouvrir le fichier Macro2010_ECONOMETRIE.sav
+
+* Variable X-M : balance commerciale en % du PIB (différence entre "X" exportations et "M" importations en % du PIB)
+
+* Variable LnGDPcap : Log. du PIB/habitant
+
+
+COMPUTE filter_$=(X_M  >  - 100  & X_M < 50).
+FILTER BY filter_$.
+EXECUTE.
+
+
+
+EXAMINE VARIABLES=LN_GDPcap X_M
+  /PLOT BOXPLOT HISTOGRAM
+  /COMPARE GROUPS
+  /PERCENTILES(5,10,25,50,75,90,95) HAVERAGE
+  /STATISTICS DESCRIPTIVES.
+
+
+
+
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT LN_GDPcap
+  /METHOD=ENTER X_M.
+
+
+
+
+
+GRAPH
+  /SCATTERPLOT(BIVAR)=X_M WITH LN_GDPcap BY Country (IDENTIFY)
+  /MISSING=LISTWISE.
+
+
+
+FILTER OFF.
+
+DELETE VARIABLES filter_$.
+
