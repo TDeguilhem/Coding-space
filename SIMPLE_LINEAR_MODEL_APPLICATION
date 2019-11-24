@@ -19,6 +19,11 @@ EXAMINE VARIABLES=LN_GDPcap X_M
 
 
 
+* Modele : Yi= bo + b1 Xi + e
+* Yi = Ln PIB pour le pays i
+* Xi = X - M pour le pays i
+* e = erreur
+
 REGRESSION
   /DESCRIPTIVES MEAN STDDEV CORR SIG N
   /MISSING LISTWISE
@@ -42,7 +47,76 @@ GRAPH
 
 
 
+
+
+
+
+
+
+
+
+
+* Modele lineaire multiple (methode enter) : Yi= bo + b1 X1i + b2 X2i + b3 X3i + b4 X4i + b5 X5i + b6 X6i + b7 X7i + e
+
+* Yi = Ln PIB pour le pays i
+* X1i = X - M pour le pays i (ouverture internationale)
+* X2i = Inf pour le pays i (politique monétaire)
+* X3i = Patent & R_D pour le pays i (progrés technique)
+* X4i = Elecrural pour le pays i (infrastructures)
+* X5i = HealthExp Socprotection_exp pour le pays i (dépenses sociales)
+* X6i = Empratio_women Poverty2USD Vulnerable pour le pays i (inégalités / vulnérabilité)
+* X7i = Migstock pour le pays i (stock de migrants)
+* e = erreurs
+
+
+REGRESSION
+  /DESCRIPTIVES MEAN STDDEV CORR SIG N
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS R ANOVA COLLIN TOL CHANGE
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT Ln_GDPcap
+  /METHOD=ENTER Density X_M Inf Patent R_D Elecrural HealthExp Socprotection_exp Empratio_women Poverty2USD Vulnerable Migstock
+  /SCATTERPLOT=(*ZPRED ,*ZRESID)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE COOK.
+
+
+
+* Modele lineaire multiple (methode enter) : Yi= bo + b1 X1i + b2 X2i + b3 X3i + b4 X4i + b5 X5i + b6 X6i + b7 X7i + e
+
+* Yi = Ln PIB pour le pays i
+* X1i = X - M pour le pays i (ouverture internationale)
+* X2i = Inf pour le pays i (politique monétaire)
+* X3i = Patent & R_D pour le pays i (progrés technique)
+* X4i = Elecrural pour le pays i (infrastructures)
+* X5i = HealthExp Socprotection_exp pour le pays i (dépenses sociales)
+* X6i = Empratio_women Poverty2USD Vulnerable pour le pays i (inégalités / vulnérabilité)
+* X7i = Migstock pour le pays i (stock de migrants)
+
+* Controles 
+
+* X8i = dummy OECD
+* X9i = dummies REGION
+
+* e = erreurs
+
+
+
+
+
+
+
+
+
+
+
+
 FILTER OFF.
 
 DELETE VARIABLES filter_$.
+
+
+
 
