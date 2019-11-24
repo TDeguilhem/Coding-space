@@ -23,7 +23,7 @@ EXAMINE VARIABLES=LN_GDPcap X_M
 
 * Modele : Yi= bo + b1 Xi + e
 * Yi = Ln PIB pour le pays i
-* Xi = X - M pour le pays i
+* Xi = X - M pour le pays i (ouverture internationale)
 * e = erreur
 
 REGRESSION
@@ -63,12 +63,12 @@ GRAPH
 * Yi = Ln PIB pour le pays i
 
 * X1i = X - M pour le pays i (ouverture internationale)
-* X2i = Inf pour le pays i (politique monétaire)
+* X2i = Inf pour le pays i (proxy des institutions monétaires)
 * X3i = Patent & R_D pour le pays i (progrés technique)
-* X4i = Elecrural pour le pays i (infrastructures)
+* X4i = Elecrural pour le pays i (proxy infrastructures)
 * X5i = HealthExp Socprotection_exp pour le pays i (dépenses sociales)
 * X6i = Empratio_women Poverty2USD Vulnerable pour le pays i (inégalités / vulnérabilité)
-* X7i = Migstock pour le pays i (stock de migrants)
+* X7i = Migstock pour le pays i (proxy de l'accueil des migrants)
 * X8i = Density pour le pays i (densité hab/km2)
 
 * e = erreurs
@@ -91,17 +91,16 @@ REGRESSION
 
 * Modele lineaire multiple (methode par étape) : Yi= bo + b1 X1i + b2 X2i + b3 X3i + b4 X4i + b5 X5i + b6 X6i + b7 X7i + b8 X8i + b10 X10i + b10 X10i + e
 
-* Yi = Ln PIB pour le pays i
 * X1i = X - M pour le pays i (ouverture internationale)
-* X2i = Inf pour le pays i (politique monétaire)
+* X2i = Inf pour le pays i (proxy des institutions monétaires)
 * X3i = Patent & R_D pour le pays i (progrés technique)
-* X4i = Elecrural pour le pays i (infrastructures)
+* X4i = Elecrural pour le pays i (proxy infrastructures)
 * X5i = HealthExp Socprotection_exp pour le pays i (dépenses sociales)
 * X6i = Empratio_women Poverty2USD Vulnerable pour le pays i (inégalités / vulnérabilité)
-* X7i = Migstock pour le pays i (stock de migrants)
+* X7i = Migstock pour le pays i (proxy de l'accueil des migrants)
 * X8i = Density pour le pays i (densité hab/km2)
 
-* Controles additionnels
+* Controles additionnels (facteurs régionaux / organisation internationale)
 
 * X9i = dummy OECD
 * X10i = dummies REGION
@@ -147,17 +146,17 @@ REGRESSION
 
 * Modele lineaire multiple (methode par étape) : Yi= bo + b1 X1i + b2 X2i + b3 X3i + b4 X4i + b5 X5i + b6 X6i + b7 X7i + b8 X8i + b10 X10i + b10 X10i + e
 
-* Yi = Ln PIB pour le pays i
+
 * X1i = X - M pour le pays i (ouverture internationale)
-* X2i = Inf pour le pays i (politique monétaire)
+* X2i = Inf pour le pays i (proxy des institutions monétaires)
 * X3i = Patent & R_D pour le pays i (progrés technique)
-* X4i = Elecrural pour le pays i (infrastructures)
+* X4i = Elecrural pour le pays i (proxy infrastructures)
 * X5i = HealthExp Socprotection_exp pour le pays i (dépenses sociales)
 * X6i = Empratio_women Poverty2USD Vulnerable pour le pays i (inégalités / vulnérabilité)
-* X7i = Migstock pour le pays i (stock de migrants)
+* X7i = Migstock pour le pays i (proxy de l'accueil des migrants)
 * X8i = Density pour le pays i (densité hab/km2)
 
-* Controles additionnels
+* Controles additionnels (facteurs régionaux / organisation internationale)
 
 * X9i = dummy OECD
 * X10i = dummies REGION
