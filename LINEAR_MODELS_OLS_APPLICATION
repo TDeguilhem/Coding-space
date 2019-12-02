@@ -67,11 +67,17 @@ GRAPH
 * X3i = Patent & R_D pour le pays i (progrés technique)
 * X4i = Elecrural pour le pays i (proxy infrastructures)
 * X5i = HealthExp Socprotection_exp pour le pays i (dépenses sociales)
-* X6i = Empratio_women Poverty2USD Vulnerable pour le pays i (inégalités / vulnérabilité)
+* X6i = Empratio_women Vulnerable pour le pays i (inégalités / vulnérabilité)
 * X7i = Migstock pour le pays i (proxy de l'accueil des migrants)
 * X8i = Density pour le pays i (densité hab/km2)
 
 * e = erreurs
+
+
+
+
+GRAPH
+  /SCATTERPLOT(MATRIX)=LN_GDPcap X_M Inf Patent R_D.
 
 
 REGRESSION
@@ -81,7 +87,7 @@ REGRESSION
   /CRITERIA=PIN(.05) POUT(.10)
   /NOORIGIN 
   /DEPENDENT Ln_GDPcap
-  /METHOD=ENTER X_M Inf Patent R_D Elecrural HealthExp Socprotection_exp Empratio_women Poverty2USD Vulnerable Migstock Density
+  /METHOD=ENTER X_M Inf Patent R_D Elecrural HealthExp Socprotection_exp Empratio_women Vulnerable Migstock Density
   /SCATTERPLOT=(*ZPRED ,*ZRESID)
   /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
   /CASEWISE PLOT(ZRESID) OUTLIERS(2)
@@ -89,14 +95,14 @@ REGRESSION
 
 
 
-* Modele lineaire multiple (methode par étape) : Yi= bo + b1 X1i + b2 X2i + b3 X3i + b4 X4i + b5 X5i + b6 X6i + b7 X7i + b8 X8i + b10 X10i + b10 X10i + e
+* Modele lineaire multiple (methode par enter) : Yi= bo + b1 X1i + b2 X2i + b3 X3i + b4 X4i + b5 X5i + b6 X6i + b7 X7i + b8 X8i + b10 X10i + b10 X10i + e
 
 * X1i = X - M pour le pays i (ouverture internationale)
 * X2i = Inf pour le pays i (proxy des institutions monétaires)
 * X3i = Patent & R_D pour le pays i (progrés technique)
 * X4i = Elecrural pour le pays i (proxy infrastructures)
 * X5i = HealthExp Socprotection_exp pour le pays i (dépenses sociales)
-* X6i = Empratio_women Poverty2USD Vulnerable pour le pays i (inégalités / vulnérabilité)
+* X6i = Empratio_women Vulnerable pour le pays i (inégalités / vulnérabilité)
 * X7i = Migstock pour le pays i (proxy de l'accueil des migrants)
 * X8i = Density pour le pays i (densité hab/km2)
 
@@ -132,7 +138,7 @@ REGRESSION
   /CRITERIA=PIN(.05) POUT(.10)
   /NOORIGIN 
   /DEPENDENT Ln_GDPcap
-  /METHOD=ENTER X_M Inf Patent R_D Elecrural HealthExp Socprotection_exp Empratio_women Poverty2USD Vulnerable Migstock Density OECD_CAT REGION__2 REGION__3 REGION__4 REGION__5
+  /METHOD=ENTER X_M Inf Patent R_D Elecrural HealthExp Socprotection_exp Empratio_women Vulnerable Migstock Density OECD_CAT REGION__2 REGION__3 REGION__4 REGION__5
   /SCATTERPLOT=(*ZPRED ,*ZRESID)
   /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
   /CASEWISE PLOT(ZRESID) OUTLIERS(2)
@@ -152,7 +158,7 @@ REGRESSION
 * X3i = Patent & R_D pour le pays i (progrés technique)
 * X4i = Elecrural pour le pays i (proxy infrastructures)
 * X5i = HealthExp Socprotection_exp pour le pays i (dépenses sociales)
-* X6i = Empratio_women Poverty2USD Vulnerable pour le pays i (inégalités / vulnérabilité)
+* X6i = Empratio_women Vulnerable pour le pays i (inégalités / vulnérabilité)
 * X7i = Migstock pour le pays i (proxy de l'accueil des migrants)
 * X8i = Density pour le pays i (densité hab/km2)
 
@@ -180,7 +186,7 @@ REGRESSION
   /METHOD=ENTER Patent R_D 
   /METHOD=ENTER Elecrural 
   /METHOD=ENTER HealthExp Socprotection_exp 
-  /METHOD=ENTER Empratio_women Poverty2USD Vulnerable 
+  /METHOD=ENTER Empratio_women Vulnerable 
   /METHOD=ENTER Migstock
   /METHOD=ENTER Density 
   /METHOD=ENTER OECD_CAT REGION__2 REGION__3 REGION__4 REGION__5
