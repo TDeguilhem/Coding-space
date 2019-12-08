@@ -95,6 +95,24 @@ REGRESSION
 
 
 
+
+
+* Ouvrir le fichier Macro2010_ECONOMETRIE.sav
+
+* Variable X-M : balance commerciale en % du PIB (différence entre "X" exportations et "M" importations en % du PIB)
+
+* Variable LnGDPcap : Log. du PIB/habitant
+
+
+
+
+COMPUTE filter_$=(X_M  >  - 100  & X_M < 50).
+FILTER BY filter_$.
+EXECUTE.
+
+
+
+
 * Modele lineaire multiple (methode par enter) : Yi= bo + b1 X1i + b2 X2i + b3 X3i + b4 X4i + b5 X5i + b6 X6i + b7 X7i + b8 X8i + b10 X10i + b10 X10i + e
 
 * X1i = X - M pour le pays i (ouverture internationale)
