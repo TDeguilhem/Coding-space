@@ -1,0 +1,129 @@
+* Modèle linéaire simple 
+
+* Forme du modele : Yi= bo + b1 Xi + ei
+
+* Options : R2, ANOVA et test de Fisher, analyse de la collinéarité, test de Durbin Watson et analyse de la distribution des résidus / distance de Cook
+
+REGRESSION
+  /DESCRIPTIVES MEAN STDDEV CORR SIG N
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA COLLIN TOL CHANGE
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT [Variable dependante]
+  /METHOD=ENTER [Variable independante]
+  /SCATTERPLOT=(*ZPRED ,*ZRESID)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE COOK.
+  
+  
+  
+  
+* Modèle linéaire multiple
+
+* Forme du modele : Yi= bo + b1 X1i + b2 X2i + ... + ei
+
+* Méthode : enter (analyse en un seul modèle avec un seul bloc de variables indépendantes)
+
+* Options : R2, ANOVA et test de Fisher, analyse de la collinéarité, test de Durbin Watson et analyse de la distribution des résidus / distance de Cook
+
+REGRESSION
+  /DESCRIPTIVES MEAN STDDEV CORR SIG N
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA COLLIN TOL CHANGE
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT [Variable dependante]
+  /METHOD=ENTER [Variables independantes]
+  /SCATTERPLOT=(*ZPRED ,*ZRESID)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE COOK.
+  
+  
+  
+  
+  
+  
+  
+* Modèle linéaire multiple avec dummies
+
+* Forme du modele : Yi= bo + b1 X1i + b2 X2i + ... + ei
+
+* Avec des variables catégorielles transformées en dummies (0, 1)
+
+
+* Méthode : enter (analyse en un seul modèle avec un seul bloc de variables indépendantes)
+
+* Options : R2, ANOVA et test de Fisher, analyse de la collinéarité, test de Durbin Watson et analyse de la distribution des résidus / distance de Cook
+
+REGRESSION
+  /DESCRIPTIVES MEAN STDDEV CORR SIG N
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95) R ANOVA COLLIN TOL CHANGE
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT [Variable dependante]
+  /METHOD=ENTER [Variables independantes]
+  /SCATTERPLOT=(*ZPRED ,*ZRESID)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE COOK.
+  
+  
+  
+  
+  
+  
+  
+* Modèles linéaires multiples avec dummies
+
+* Forme du modele : Yi= bo + b1 X1i + b2 X2i + ... + ei
+
+* Avec des variables catégorielles transformées en dummies (0, 1)
+
+
+* Méthode : step (analyse avec plusieurs modèles par bloc de variables indépendantes)
+
+* Options : R2, ANOVA et test de Fisher, analyse de la collinéarité, test de Durbin Watson et analyse de la distribution des résidus / distance de Cook
+
+REGRESSION
+  /DESCRIPTIVES MEAN STDDEV CORR SIG N
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS CI(95)  R ANOVA COLLIN TOL CHANGE
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT [Variable dépendante]
+   /METHOD=STEPWISE [Variable d'intérêt]
+  /METHOD=ENTER  [Bloc 1 de variables indépendantes]
+  /METHOD=ENTER [Bloc 2 de variables indépendantes]
+  ...
+  /SCATTERPLOT=(*ZPRED ,*ZRESID)
+  /RESIDUALS DURBIN HISTOGRAM(ZRESID) NORMPROB(ZRESID)
+  /CASEWISE PLOT(ZRESID) OUTLIERS(2)
+  /SAVE COOK.
+  
+  
+  
+  
+  
+  
+  
+ * Modèle logisitique : économétrie à choix qualitatif binaire
+  
+  
+ * Forme du modèle : Pr(Yi=1|X1i, X2i...) = bo + b1 X1i + b2 X2i + ... + ei
+   
+  
+* Méthode : enter (analyse avec un seul modèle et un bloc de variables indépendantes)
+
+* Options : Pseudo R2, LoG vraissemblance, classement des observations et analyse de la distribution des résidus / distance de Cook
+
+
+LOGISTIC REGRESSION VARIABLES [Variable dépendante]
+  /METHOD=ENTER [Variables indépendantes]
+   /SAVE=PRED PGROUP COOK ZRESID
+  /CLASSPLOT
+  /PRINT=GOODFIT CORR CI(95)
+  /CRITERIA=PIN(0.05) POUT(0.10) ITERATE(20) CUT(0.5).
