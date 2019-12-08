@@ -1,0 +1,110 @@
+* Statistique inférentielle (tests d'hypothèse)
+
+
+
+* test d'indépendance (chi2 et v de Cramer) entre deux variables qualitatives
+* Ho : les deux variables sont indépendantes
+* H1 : les deux variables ne sont pas indépendantes
+
+
+CROSSTABS
+  /TABLES=[Variable 1] BY [Variable 2]
+  /FORMAT=AVALUE TABLES
+  /STATISTICS=CHISQ PHI 
+  /CELLS=COUNT EXPECTED ASRESID.
+  
+
+
+* tests de normalité (Kolmogorov-Smirnoff et Shapiro-Wilks) de la distribution d'une variable quantitative
+* Ho : normalité de la distribution
+* H1 : absence de normalité
+
+
+EXAMINE VARIABLES=[Variable]
+  /PLOT BOXPLOT HISTOGRAM NPPLOT
+  /COMPARE GROUPS
+  /STATISTICS DESCRIPTIVES
+  /CINTERVAL 95
+  /MISSING LISTWISE
+  /NOTOTAL.
+  
+
+
+
+* test de conformité de la moyenne d'une variable quantitative à une valeur de réfrence (test T de student) 
+* Ho : la moyenne est égale à la valeur de référence
+* H1 : la moyenne est différente à la valeur de référence
+
+
+
+T-TEST
+  /TESTVAL=100
+  /MISSING=ANALYSIS
+  /VARIABLES=[Variable]
+  /CRITERIA=CI(.95).
+
+
+
+
+
+* test de comparaison de moyennes d'une variable quantitative sur DEUX échantillons indépendants (test T de student) 
+* Ho : la moyenne de l'échantillon 1 est égale à celle de l'échantillon 2
+* H1 : la moyenne de l'échantillon 1 est différente à celle de l'échantillon 2
+
+
+T-TEST GROUPS=[Variable bianire](1 2 [échantillons])
+  /MISSING=ANALYSIS
+  /VARIABLES=Cell
+  /CRITERIA=CI(.95).
+
+
+
+
+
+* test de comparaison de décomposition de la variance d'une variable quantitative sur PLUSIEURS échantillons indépendants (test d'ANOVA) 
+* Ho : toutes les moyennes des échantillons indépendants sont équivalentes
+* H1 : au moins deux moyennes sont différentes
+
+
+
+ONEWAY [Variable quantitative] BY [Variable qualitative]
+  /STATISTICS DESCRIPTIVES HOMOGENEITY 
+  /PLOT MEANS
+  /MISSING ANALYSIS.
+  
+  
+  
+  
+  
+  
+* test post hoc de comparaison de moyennes d'une variable quantitative sur PLUSIEURS échantillons indépendants (test de Bonferroni) 
+* Ho : la moyenne de l'échantillon i est égale à celle de l'échantillon n
+* H1 : elles sont différentes
+
+
+
+ONEWAY [Variable quantitative] BY [Variable qualitative]
+  /STATISTICS DESCRIPTIVES HOMOGENEITY 
+  /PLOT MEANS
+  /MISSING ANALYSIS
+  /POSTHOC=BONFERRONI ALPHA(0.05).
+
+
+
+
+
+
+* test de corrélation entre deux variables quantitatives (test de Pearson) 
+* Ho : le coefficient de corrélation (r) est égal à 0
+* H1 : il est différent de 0
+
+  
+CORRELATIONS
+  /VARIABLES=[Variables]
+  /PRINT=TWOTAIL NOSIG
+  /STATISTICS DESCRIPTIVES
+  /MISSING=PAIRWISE.
+
+
+
+
