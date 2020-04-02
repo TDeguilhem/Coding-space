@@ -15,13 +15,18 @@ EXECUTE.
 DESCRIPTIVES  Life_exp_women Life_exp_men Anemia_preg_women Poverty2USD Vulnerable Socprotection_exp 
     Elecrural HealthExp
     /SAVE.
-    
+ 
+ FILTER OFF.
 ```
 
 ## ACP
 
 
 ```{r}
+
+IF (OECD=1) OECD_CAT=1.
+  FILTER BY OECD_CAT.
+EXECUTE.
 
 FACTOR
   /VARIABLES Life_exp_women Life_exp_men Anemia_preg_women Poverty2USD Vulnerable Socprotection_exp 
@@ -38,12 +43,17 @@ FACTOR
   /SAVE REG(ALL)
   /METHOD=CORRELATION.
   
+  FILTER OFF.
 ```
   
 ## Représentations graphiques  
   
   ```{r}
-  
+
+IF (OECD=1) OECD_CAT=1.
+  FILTER BY OECD_CAT.
+EXECUTE.
+
 GRAPH
   /SCATTERPLOT(BIVAR)=FAC1_2 WITH FAC2_2 BY Country (IDENTIFY)
   /MISSING=LISTWISE.
