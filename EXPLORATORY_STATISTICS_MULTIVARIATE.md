@@ -1,4 +1,4 @@
-### CHAPITRE 3 ACP avec SPSS - Application
+# 3.2 ACP avec SPSS - Application
 
 
 
