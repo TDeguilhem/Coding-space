@@ -1,10 +1,11 @@
-### Application : ACP 
+### Application : ACP avec SPSS
 
 
 
-* Z_scores des variables concernées
+## Z_scores des variables concernées
 
 
+```{r}
 
 IF (OECD=1) OECD_CAT=1.
   FILTER BY OECD_CAT.
@@ -15,10 +16,12 @@ DESCRIPTIVES  Life_exp_women Life_exp_men Anemia_preg_women Poverty2USD Vulnerab
     Elecrural HealthExp
     /SAVE.
     
+```
 
-* ACP
+## ACP
 
 
+```{r}
 
 FACTOR
   /VARIABLES Life_exp_women Life_exp_men Anemia_preg_women Poverty2USD Vulnerable Socprotection_exp 
@@ -35,8 +38,11 @@ FACTOR
   /SAVE REG(ALL)
   /METHOD=CORRELATION.
   
-
+```
   
+## Représentations graphiques  
+  
+  ```{r}
   
 GRAPH
   /SCATTERPLOT(BIVAR)=FAC1_2 WITH FAC2_2 BY Country (IDENTIFY)
@@ -60,19 +66,6 @@ EXECUTE.
 GRAPH
   /BAR(SIMPLE)=MEAN(Mean_MULTI) BY HDI
   /INTERVAL CI(95.0).
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -106,3 +99,4 @@ GRAPH
 
 FILTER OFF.
   
+```
